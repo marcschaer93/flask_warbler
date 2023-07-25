@@ -1,6 +1,5 @@
 import os
 
-from flask_sqlalchemy import SQLAlchemy
 
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
@@ -11,7 +10,7 @@ from forms import UserAddForm, LoginForm, MessageForm
 from models import db, User, Message
 
 
-db = SQLAlchemy()
+
 
 def create_app():
     app = Flask(__name__)
