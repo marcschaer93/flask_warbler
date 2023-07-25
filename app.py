@@ -1,5 +1,7 @@
 import os
 
+from .extensions import db
+
 
 from flask import Flask, render_template, request, flash, redirect, session, url_for, g
 from flask_debugtoolbar import DebugToolbarExtension
@@ -8,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm
 from models import db, User, Message
+
 
 
 
