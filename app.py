@@ -1,13 +1,15 @@
 import os
 
 
-from flask import Flask, render_template, request, flash, redirect, session, g
+from flask import Flask, render_template, request, flash, redirect, session, url_for, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 
 from forms import UserAddForm, LoginForm, MessageForm
 from models import db, User, Message
+
+
 
 
 def create_app():
@@ -20,7 +22,7 @@ def create_app():
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = False
-    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 
     db.init_app(app)
@@ -41,6 +43,10 @@ CURR_USER_KEY = "curr_user"
 ##############################################################################
 # User signup/login/logout
 
+
+# Set up the debugger to stop execution at a breakpoint
+import pdb
+app.debug = True
 
 @app.before_request
 def add_user_to_g():
@@ -77,7 +83,6 @@ def signup():
     If the there already is a user with that username: flash message
     and re-present form.
     """
-
     form = UserAddForm()
 
     if form.validate_on_submit():
@@ -125,7 +130,10 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
-
+    session.pop('curr_user')
+    
+    flash("Successfully Logged out", "success")
+    return redirect(url_for('login'))
     # IMPLEMENT THIS
 
 
@@ -163,6 +171,8 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
+
+
     return render_template('users/show.html', user=user, messages=messages)
 
 
