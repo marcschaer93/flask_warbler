@@ -6,7 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 
-from forms import UserAddForm, LoginForm, MessageForm
+from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
 from models import db, User, Message
 
 
@@ -234,12 +234,16 @@ def profile():
     """Update profile for current user."""
     user_id = session[CURR_USER_KEY]
     user = User.query.get_or_404(user_id)
-    form = UserAddForm(obj=user)
+    form = UserEditForm(obj=user)
 
     if form.validate_on_submit():
         user.username = form.username.data
         user.email = form.email.data
-        user.imgage_url = form.image_url.data
+        user.location = form.location.data
+        user.bio = form.bio.data
+        user.image_url = form.image_url.data or "/static/images/default-pic.png"
+        user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
+        
         db.session.commit()
 
         return redirect(url_for('users_show', user_id=user_id ))

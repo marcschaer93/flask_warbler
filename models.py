@@ -81,6 +81,8 @@ class User(db.Model):
         default="/static/images/warbler-hero.jpg"
     )
 
+
+
     bio = db.Column(
         db.Text,
     )
