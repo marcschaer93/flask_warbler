@@ -134,7 +134,6 @@ def logout():
     
     flash("Successfully Logged out", "success")
     return redirect(url_for('login'))
-    # IMPLEMENT THIS
 
 
 ##############################################################################
@@ -233,8 +232,19 @@ def stop_following(follow_id):
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
     """Update profile for current user."""
+    user_id = session[CURR_USER_KEY]
+    user = User.query.get_or_404(user_id)
+    form = UserAddForm(obj=user)
 
-    # IMPLEMENT THIS
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data
+        user.imgage_url = form.image_url.data
+        db.session.commit()
+
+        return redirect(url_for('users_show', user_id=user_id ))
+    
+    return render_template('users/edit.html', form=form)
 
 
 @app.route('/users/delete', methods=["POST"])
