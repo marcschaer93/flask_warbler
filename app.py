@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from flask_migrate import Migrate
+
 
 from forms import UserAddForm, LoginForm, MessageForm
 from models import db, User, Message
@@ -38,7 +38,6 @@ def create_app():
     return app
 
 app = create_app()
-migrate = Migrate(app, db)
 toolbar = DebugToolbarExtension(app)
 
 
