@@ -43,8 +43,8 @@ CURR_USER_KEY = "curr_user"
 
 
 # Set up the debugger to stop execution at a breakpoint
-import pdb
-app.debug = True
+# import pdb
+# app.debug = True
 
 @app.before_request
 def add_user_to_g():
