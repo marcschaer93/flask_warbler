@@ -13,10 +13,10 @@ class UserAddForm(FlaskForm):
     """Form for adding users."""
 
     username = StringField('Username', validators=[DataRequired()])
-    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    email = StringField('E-Mail', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[Length(min=6)])
     location = StringField('Location')
-    bio = TextAreaField('(Optional) Bio', validators=[Length(max=200)])
+    bio = TextAreaField('(Optional) Tell us about yourself', validators=[Length(max=200)])
     image_url = StringField('(Optional) Image URL')
     header_image_url = StringField('(Optional) Header URL')
 
@@ -33,7 +33,7 @@ class UserEditForm(FlaskForm):
     """Form for editing users."""
 
     username = StringField('Username', validators=[DataRequired()])
-    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    email = StringField('E-Mail', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[Length(min=6)])
     location = StringField('Location')
     bio = TextAreaField('(Optional) Tell us about yourself')
