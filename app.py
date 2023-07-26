@@ -334,11 +334,20 @@ def homepage():
     """
 
     if g.user:
+       
+        follower_ids = [follower.id for follower in g.user.followers] + [g.user.id]
         messages = (Message
                     .query
+                    .filter(Message.user_id.in_(follower_ids))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
+        
+        # messages = (Message
+        #             .query
+        #             .order_by(Message.timestamp.desc())
+        #             .limit(100)
+        #             .all())
 
         return render_template('home.html', messages=messages)
 
