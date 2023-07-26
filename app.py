@@ -1,15 +1,13 @@
 import os
 
 
-from flask import Flask, render_template, request, flash, redirect, session, url_for, g
+from flask import Flask, render_template, request, flash, redirect, session, url_for, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
 from models import db, User, Message, Likes
-
-
 
 
 def create_app():
@@ -198,6 +196,19 @@ def users_followers(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
 
+@app.route('/users/<int:user_id>/likes')
+def users_likes(user_id):
+    """Show list of Likes of this User"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    user = User.query.get_or_404(user_id)
+    liked_msg_ids = [msg.id for msg in user.likes]
+    print('#############', liked_msg_ids)
+    return render_template('users/likes.html', user=user)
+
 
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
 def add_follow(follow_id):
@@ -329,8 +340,8 @@ def like_warble(message_id):
         return redirect("/")
     
     liked_message = Message.query.get_or_404(message_id)
-    # if liked_message.user_id == g.user.id:
-    #     return abort(403)
+    if liked_message.user_id == g.user.id:
+        return redirect("/")
 
     user_likes = g.user.likes
     if liked_message in user_likes:
@@ -366,7 +377,7 @@ def homepage():
                     .limit(100)
                     .all())
 
-        liked_msg_ids= [msg.id for msg in g.user.likes]
+        liked_msg_ids = [msg.id for msg in g.user.likes]
         
 
         return render_template('home.html', messages=messages, likes=liked_msg_ids)
