@@ -5,14 +5,14 @@
             <ul class="list-group" id="messages">
                 {% for msg in user.likes %}
                 <li class="list-group-item">
-                  <a href="/messages/{{msg.id}}" class="message-link">
-        
-                  </a><a href="/users/{{msg.user_id}}">
+                  <a href="{{ url_for('message.show_message', message_id=msg.id) }}" class="message-link">
+                  </a>
+                  <a href="{{ url_for('profile.show_user', user_id=msg.user_id) }}">
                     <img src="{{msg.user.image_url}}" alt="user image" class="timeline-image">
                   </a>
         
                   <div class="message-area">
-                    <a href="/users/{{msg.user.id}}">@{{msg.user.username}}</a>
+                    <a href="{{ url_for('profile.show_user', user_id=msg.user_id) }}">@{{msg.user.username}}</a>
                     <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}
                     </span>
                     <p>{{msg.text}}</p>

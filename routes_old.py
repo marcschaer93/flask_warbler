@@ -10,7 +10,7 @@ from models import db, User, Message, Likes
 
 
 # Create a Blueprint instance for the routes
-main = Blueprint('routes', __name__)
+main = Blueprint('routes', __name__, static_folder="static", template_folder="template")
 
 
 CURR_USER_KEY = "curr_user"
@@ -261,6 +261,28 @@ def delete_user():
 
     return redirect("/signup")
 
+@main.route('/users/add_like/<int:message_id>', methods=["GET", "POST"])
+def like_warble(message_id):
+    """Toggle (Like or "Dislike") a Message from a User"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    liked_message = Message.query.get_or_404(message_id)
+    if liked_message.user_id == g.user.id:
+        return redirect("/")
+
+    user_likes = g.user.likes
+    if liked_message in user_likes:
+        g.user.likes = [like for like in user_likes if like != liked_message]
+    else:
+        g.user.likes.append(liked_message)
+
+    db.session.commit()
+    return redirect("/")
+       
+
 
 ##############################################################################
 # Messages routes:
@@ -310,59 +332,39 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
-@main.route('/users/add_like/<int:message_id>', methods=["GET", "POST"])
-def like_warble(message_id):
-    """Toggle (Like or "Dislike") a Message from a User"""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-    
-    liked_message = Message.query.get_or_404(message_id)
-    if liked_message.user_id == g.user.id:
-        return redirect("/")
-
-    user_likes = g.user.likes
-    if liked_message in user_likes:
-        g.user.likes = [like for like in user_likes if like != liked_message]
-    else:
-        g.user.likes.append(liked_message)
-
-    db.session.commit()
-    return redirect("/")
-       
 
 
 ##############################################################################
 # Homepage and error pages
 
 
-@main.route('/')
-def homepage():
-    """Show homepage:
+# @main.route('/')
+# def homepage():
+#     """Show homepage:
 
-    - anon users: no messages
-    - logged in: 100 most recent messages of followed_users
-    """
+#     - anon users: no messages
+#     - logged in: 100 most recent messages of followed_users
+#     """
 
-    if g.user:
+#     if g.user:
        
-        follower_ids = [follower.id for follower in g.user.following] + [g.user.id]
-        print(follower_ids)
-        messages = (Message
-                    .query
-                    .filter(Message.user_id.in_(follower_ids))
-                    .order_by(Message.timestamp.desc())
-                    .limit(100)
-                    .all())
+#         follower_ids = [follower.id for follower in g.user.following] + [g.user.id]
+#         print(follower_ids)
+#         messages = (Message
+#                     .query
+#                     .filter(Message.user_id.in_(follower_ids))
+#                     .order_by(Message.timestamp.desc())
+#                     .limit(100)
+#                     .all())
 
-        liked_msg_ids = [msg.id for msg in g.user.likes]
+#         liked_msg_ids = [msg.id for msg in g.user.likes]
         
 
-        return render_template('home.html', messages=messages, likes=liked_msg_ids)
+#         return render_template('home.html', messages=messages, likes=liked_msg_ids)
 
-    else:
-        return render_template('home-anon.html')
+#     else:
+#         return render_template('home-anon.html')
 
 
 ##############################################################################
