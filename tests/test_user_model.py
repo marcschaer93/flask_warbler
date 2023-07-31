@@ -8,7 +8,8 @@
 import os
 from unittest import TestCase
 
-from models import db, User, Message, Follows
+from models import User, Message, Follows
+from extensions import db
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -20,13 +21,14 @@ os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
 
 # Now we can import app
 
-from routes import app
+from app import create_app
 
 # Create our tables (we do this here, so we only create the tables
 # once for all tests --- in each test, we'll delete the data
 # and create fresh new clean test data
 
-db.create_all()
+# with app.app_context():
+#     db.create_all()
 
 
 class UserModelTestCase(TestCase):
@@ -34,16 +36,23 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         """Create test client, add sample data."""
-
+        
+        self.app = create_app()  # Create the Flask app
+        
+        with self.app.app_context():  # Enter the app context
+            db.create_all()  # Create the necessary tables for the test database
+        
         User.query.delete()
         Message.query.delete()
         Follows.query.delete()
 
-        self.client = app.test_client()
+        self.client = self.app.test_client()
+
+
 
     def test_user_model(self):
         """Does basic model work?"""
-
+        
         u = User(
             email="test@test.com",
             username="testuser",
@@ -56,3 +65,13 @@ class UserModelTestCase(TestCase):
         # User should have no messages & no followers
         self.assertEqual(len(u.messages), 0)
         self.assertEqual(len(u.followers), 0)
+
+
+    def tearDown(self):
+        """Clean up after each test."""
+        with self.app.app_context():  # Enter the app context
+            db.session.remove()  # Close the database session
+            db.drop_all()  # Drop the tables
+
+
+

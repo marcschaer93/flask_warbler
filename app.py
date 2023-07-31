@@ -1,9 +1,7 @@
 import os
 
-from flask import Flask, session, g, Blueprint
+from flask import Flask
 from extensions import db, debug, bcrypt
-# from routes import main
-from models import User
 
 from routes.home import home
 from routes.auth import auth_bp
@@ -38,7 +36,6 @@ def create_app():
 
  
     # Import and register blueprints
-    # app.register_blueprint(main, url_prefix="")
     app.register_blueprint(home, url_prefix="")
     app.register_blueprint(auth_bp, url_prefix="")
     app.register_blueprint(profile_bp, url_prefix="/users")
