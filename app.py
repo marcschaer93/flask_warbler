@@ -31,7 +31,7 @@ def create_app():
 
     # Initialize the database, debugToolbar
     db.init_app(app)
-    debug.init_app(app)
+    # debug.init_app(app)
     bcrypt.init_app(app)
 
  
