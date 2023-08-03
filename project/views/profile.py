@@ -1,13 +1,13 @@
 """Routes Profile"""
 
-from extensions import db
+from project.extensions import db
 
 from flask import render_template, request, flash, redirect, session, url_for, g, Blueprint
-from forms import UserEditForm
-from models import db, User, Message
+from project.forms import UserEditForm
+from project.models import db, User, Message
 
 # Create a Blueprint instance for the routes
-profile_bp = Blueprint('profile', __name__)
+profile_bp = Blueprint('profile', __name__, static_folder="static", template_folder="templates")
 
 CURR_USER_KEY = "curr_user"
 ##############################################################################

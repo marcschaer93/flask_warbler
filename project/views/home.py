@@ -1,9 +1,9 @@
 """Routes Home"""
 
-from extensions import db
+from project.extensions import db
 
 from flask import render_template, request, flash, redirect, session, url_for, g, Blueprint
-from models import db, User, Message, Likes
+from project.models import db, User, Message, Likes
 
 # Create a Blueprint instance for the routes
 home = Blueprint('home', __name__)
@@ -61,10 +61,10 @@ def show_home():
         liked_msg_ids = [msg.id for msg in g.user.likes]
         
 
-        return render_template('home.html', messages=messages, likes=liked_msg_ids)
+        return render_template('home/home.html', messages=messages, likes=liked_msg_ids)
 
     else:
-        return render_template('home-anon.html')
+        return render_template('home/home-anon.html')
 
 
 @home.after_request

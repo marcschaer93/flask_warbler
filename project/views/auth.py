@@ -1,15 +1,15 @@
 """Routes Authentitation"""
 
-from extensions import db
+from project.extensions import db
 
 from flask import render_template, request, flash, redirect, session, url_for, g, abort, Blueprint
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
-from models import db, User, Message, Likes
+from project.forms import UserAddForm, LoginForm, MessageForm, UserEditForm
+from project.models import db, User, Message, Likes
 
 # Create a Blueprint instance for the routes
-auth_bp = Blueprint('auth', __name__, static_folder="static", template_folder="template")
+auth_bp = Blueprint('auth', __name__, static_folder="static", template_folder="templates")
 
 CURR_USER_KEY = "curr_user"
 ##############################################################################

@@ -1,13 +1,13 @@
 """Routes Messages"""
 
-from extensions import db
+from project.extensions import db
 
 from flask import render_template, request, flash, redirect, session, url_for, g, Blueprint
-from forms import MessageForm
-from models import db, User, Message
+from project.forms import MessageForm
+from project.models import db, User, Message
 
 # Create a Blueprint instance for the routes
-message_bp = Blueprint('message', __name__, static_folder="static", template_folder="template")
+message_bp = Blueprint('message', __name__, static_folder="static", template_folder="templates")
 
 CURR_USER_KEY = "curr_user"
 ##############################################################################

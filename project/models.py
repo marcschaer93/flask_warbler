@@ -1,7 +1,7 @@
 """SQLAlchemy models for Warbler."""
 
 from datetime import datetime
-from extensions import db, bcrypt
+from project.extensions import db, bcrypt
 
 class Follows(db.Model):
     """Connection of a follower <-> followed_user."""
@@ -88,14 +88,15 @@ class User(db.Model):
         nullable=False,
     )
 
-    # messages = db.relationship('Message')
     messages = db.relationship('Message', back_populates='user')
+    # messages = db.relationship('Message')
 
     followers = db.relationship(
         "User",
         secondary="follows",
         primaryjoin=(Follows.user_being_followed_id == id),
-        secondaryjoin=(Follows.user_following_id == id)
+        secondaryjoin=(Follows.user_following_id == id),
+        overlaps="following" # Add this line
      
     )
 
@@ -103,7 +104,8 @@ class User(db.Model):
         "User",
         secondary="follows",
         primaryjoin=(Follows.user_following_id == id),
-        secondaryjoin=(Follows.user_being_followed_id == id)
+        secondaryjoin=(Follows.user_being_followed_id == id),
+        overlaps="followers" # Add this line
     )
 
     likes = db.relationship(
