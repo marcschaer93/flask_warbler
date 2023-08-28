@@ -45,7 +45,7 @@ Warbler is a Twitter clone built with Flask, SQLAlchemy, and Bootstrap.
 6. Create the database:
 
    ```bash
-   flask db_create
+   flask db_create warbler
    ```
 
 7. Run the application:
@@ -59,6 +59,18 @@ Warbler is a Twitter clone built with Flask, SQLAlchemy, and Bootstrap.
 ## Testing
 
 To run the tests:
+
+Make sure you are in the right ENV:
+
+```bash
+export FLASK_ENV=testing
+```
+
+instead of:
+
+```bash
+export FLASK_ENV=development
+```
 
 ```bash
 pytest
@@ -86,7 +98,3 @@ The code in this project is licensed under the MIT License. See [LICENSE.md](LIC
 
 - Built following the best practices from Flask documentation.
 - Inspired by [Twitter](https://twitter.com).
-
----
-
-Feel free to customize this README to fit the specific technologies and approaches you are using.
