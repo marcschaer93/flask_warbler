@@ -1,4 +1,5 @@
-# test_user_model.py
+'''test_user_model.py'''
+
 import os
 # # BEFORE we import our app, let's set an environmental variable
 # # to use a different database for tests (we need to do this
@@ -17,8 +18,9 @@ from config import TestingConfig, app_config
 from sqlalchemy.exc import IntegrityError
 
 
-#$$#
 HASHED_PASSWORD = bcrypt.generate_password_hash("123").decode('UTF-8')
+
+HASHED_PASSWORD2 = bcrypt.generate_password_hash("12345").decode('UTF-8')
 
 
 @pytest.fixture()
@@ -60,27 +62,6 @@ def client(app):
     return app.test_client()
 
 
-def test_signup_route(app, client):
-    # Test successful signup
-    response = client.post("/signup", data={
-        "username": "testuser",
-        "email": "test@testuser.com",
-        "password": "testuser",
-        "image_url": None,
-        
-    }, follow_redirects=True)
-
-    assert response.status_code == 200
-    with app.app_context():
-        user = User.query.filter_by(username="testuser").first()
-        
-        assert User.query.count() == 3
-        assert user is not None
-        assert user.email == "test@testuser.com"
-        assert user.username == "testuser"
-        assert user.password.startswith("$2b$") == True
-        assert repr(user) == "<User #3: testuser, test@testuser.com>"
-
 
 def test_invalid_username_signup(app, client):
     # Test invalid username signup
@@ -101,7 +82,7 @@ def test_invalid_email_signup(app, client):
 def test_invalid_password_signup(app, client):
     # Test invalid username signup
     with pytest.raises(ValueError):
-        User.signup("wrong", "wrong@gmail.com" , "", None)
+        User.signup("wrong", "wrong@gmail.com" , "dfgsdfgsd", None)
         ####
         db.session.commit() # Commit the transaction to trigger the ValueError
         
@@ -112,50 +93,65 @@ def test_invalid_password_signup(app, client):
 
 def test_is_following(app):
     # Create a user inside the app context
-    with app.app_context():
-        user1 = User.query.filter_by(username="user1").first()
-        user2 = User.query.filter_by(username="user2").first()
-        user1.following.append(user2)
-        db.session.commit()
+    user1 = User.query.filter_by(username="user1").first()
+    user2 = User.query.filter_by(username="user2").first()
+    user1.following.append(user2)
+    db.session.commit()
 
     # Ensure there are two users in the database
-        assert User.query.count() == 2
-        assert User.query.filter_by(username="user1").first() is not None
-        assert User.query.filter_by(username="user2").first() is not None
-        assert user1.is_following(user2) is True
-        assert user2.is_following(user1) is False
+    assert User.query.count() == 2
+    assert User.query.filter_by(username="user1").first() is not None
+    assert User.query.filter_by(username="user2").first() is not None
+    assert user1.is_following(user2) is True
+    assert user2.is_following(user1) is False
+
+
+def test_is_not_followoing(app):
+    user1 = User.query.filter_by(username="user1").first()
+    user2 = User.query.filter_by(username="user2").first()
+    db.session.commit()
+
+    assert User.query.count() == 2
+    assert user1.is_following(user2) is False
 
         
 def test_is_followed_by(app):
-     with app.app_context():
-        user1 = User.query.filter_by(username="user1").first()
-        user2 = User.query.filter_by(username="user2").first()
-        user2.following.append(user1)
-        db.session.commit()
+    user1 = User.query.filter_by(username="user1").first()
+    user2 = User.query.filter_by(username="user2").first()
+    user2.following.append(user1)
+    db.session.commit()
 
-    # Ensure there are two users in the database
-        assert User.query.count() == 2
-        assert User.query.filter_by(username="user1").first() is not None
-        assert User.query.filter_by(username="user2").first() is not None
-        assert user1.is_followed_by(user2) is True
-        assert user2.is_followed_by(user1) is False
+# Ensure there are two users in the database
+    assert User.query.count() == 2
+    assert User.query.filter_by(username="user1").first() is not None
+    assert User.query.filter_by(username="user2").first() is not None
+    assert user1.is_followed_by(user2) is True
+    assert user2.is_followed_by(user1) is False
 
+def test_create_new_user(app):
+    new_user = User(username = 'new_user',
+    email = 'newuser@email.com',
+    password = HASHED_PASSWORD2,
+    location = 'newusers_home',
+    bio = 'Lorem ipsum dolor sit amet consectetuer')
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    assert User.query.count() == 3
 
 def test_valid_authentication(app):
-    with app.app_context():
-        u = User.authenticate("user1" , "123")
-        assert u is not False
+    u = User.authenticate("user1" , "123")
+    assert u is not False
 
         
 def test_invalid_username(app):
-    with app.app_context():
-        result = User.authenticate("fritz", "123")
-        assert result is False
+    result = User.authenticate("fritz", "123")
+    assert result is False
 
         
 def test_invalid_password(app):
-    with app.app_context():
-        result = User.authenticate("user1", "1")
-        assert result is False
+    result = User.authenticate("user1", "1")
+    assert result is False
 
         

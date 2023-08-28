@@ -19,7 +19,9 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
 
     if CURR_USER_KEY in session:
-        g.user = User.query.get(session[CURR_USER_KEY])
+        # g.user = User.query.get(session[CURR_USER_KEY])
+        g.user = db.session.get(User, session[CURR_USER_KEY])
+
 
     else:
         g.user = None
@@ -164,9 +166,14 @@ def update_user():
             user.image_url = form.image_url.data or "/static/images/default-pic.png"
             user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
             
-        flash('Wrong Pasword or Username!', 'danger')
-        db.session.commit()
-        return redirect(url_for('profile.show_user', user_id=user.id ))
+            db.session.commit()
+
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('profile.show_user', user_id=user.id ))
+        else:
+            flash('Wrong Pasword or Username!', 'danger')
+            
+        return render_template('users/edit.html', form=form)
     
     return render_template('users/edit.html', form=form)
 

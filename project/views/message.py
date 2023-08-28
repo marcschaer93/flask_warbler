@@ -19,7 +19,9 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
 
     if CURR_USER_KEY in session:
-        g.user = User.query.get(session[CURR_USER_KEY])
+        # g.user = User.query.get(session[CURR_USER_KEY])
+        g.user = db.session.get(User, session[CURR_USER_KEY])
+
 
     else:
         g.user = None
@@ -58,9 +60,8 @@ def add_message():
         msg = Message(text=form.text.data)
         g.user.messages.append(msg)
         db.session.commit()
-
         return redirect(f"/users/{g.user.id}")
-
+    
     return render_template('messages/new.html', form=form)
 
 

@@ -49,16 +49,15 @@ def login(client, testuser):
     """Log in the test user."""
     with client.session_transaction() as sess:
         sess[CURR_USER_KEY] = testuser.id
+    return True  # indicate successful login
 
 
 def test_add_message(client, app):
     """Can user add a message?"""
-    # pdb.debug = True
-    # pdb.set_trace()
-    with app.app_context():
-        testuser = User.query.filter_by(username="user1").first()
-        # Log in the test user
-        login(client, testuser)
+ 
+    testuser = User.query.filter_by(username="user1").first()
+    # Log in the test user
+    login(client, testuser)
 
     # Make a POST request to add a message
     resp = client.post("/messages/new", data={"text": "Hello"})
@@ -68,6 +67,7 @@ def test_add_message(client, app):
 
     # Check if the message is added to the database
     msg = Message.query.one()
+    
     assert msg.text == "Hello"
     assert Message.query.count() == 1
 
@@ -75,26 +75,23 @@ def test_add_message(client, app):
 def test_show_message(client, app):
     """Can a User see a Message by ID ?"""
     
-    with app.app_context():
-        testuser = User.query.filter_by(username="user1").first()
-        # Log in the test user
-        login(client, testuser)
+    testuser = User.query.filter_by(username="user1").first()
+    # Log in the test user
+    login(client, testuser)
+    
+    msg = Message(id=999, text="New Message", user_id=testuser.id )
+    db.session.add(msg)
+    db.session.commit()
 
         
-        msg = Message(id=999, text="New Message", user_id=testuser.id )
-        db.session.add(msg)
-        db.session.commit()
-
-        #$$# NEWER method (2)
-        # msg = Message.query.get(999)
-        msg = db.session.get(Message, 999)
-
-        
-        resp = client.get(f"/messages/{msg.id}")
+    msg = db.session.get(Message, 999)
+    resp = client.get(f"/messages/{msg.id}")
 
     
     assert Message.query.count() == 1
     assert resp.status_code == 200
+
+
 
     
     
