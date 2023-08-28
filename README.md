@@ -72,6 +72,8 @@ instead of:
 export FLASK_ENV=development
 ```
 
+Then:
+
 ```bash
 pytest
 ```
